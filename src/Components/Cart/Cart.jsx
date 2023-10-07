@@ -1,18 +1,22 @@
 import React, { useContext, useEffect, useState } from 'react';
 import styles from './Cart.module.css';
 import { CartContext } from '../../Context/CartContext';
-import { TailSpin } from 'react-loader-spinner';
+import { Oval } from 'react-loader-spinner';
+import { Link } from 'react-router-dom';
+
 
 
 export default function Cart() {
-  let { getLoggedUserCart, Remove, Update } = useContext(CartContext);
-  const [cartDetails, setCartDetails] = useState(null);
+  let { getLoggedUserCart, Remove, Update, Clear, cartDetails, setCartDetails } = useContext(CartContext);
 
+  async function ClearCart() {
+    let { data } = await Clear();
+    getCart();
+  }
 
   async function UpdateCount(id, count) {
     let { data } = await Update(id, count);
     setCartDetails(data);
-
   }
 
 
@@ -22,6 +26,7 @@ export default function Cart() {
   }
 
   async function getCart() {
+    setCartDetails('loading')
     let { data } = await getLoggedUserCart();
     setCartDetails(data);
   }
@@ -34,9 +39,36 @@ export default function Cart() {
 
 
   return <>
-    {cartDetails ? <div className="w-75 mx-auto p-2 my-3 bg-main-light">
+    {cartDetails == 'loading' ? <section id='loading' className='d-flex justify-content-center align-items-center'> 
+     
+    <Oval
+  height={80}
+  width={80}
+  color="#4fa94d"
+  wrapperStyle={{}}
+  wrapperClass=""
+  visible={true}
+  ariaLabel='oval-loading'
+  secondaryColor="#4fa94d"
+  strokeWidth={2}
+  strokeWidthSecondary={2}
 
-      <h3>shopping cart</h3>
+/> </section> : !cartDetails || !cartDetails.numOfCartItems ? <div className="w-75 mx-auto p-2 my-3 bg-main-light">
+      <h3 className='fw-bolder'>Cart Shop</h3>
+      <h4 className='h6 text-main fw-bolder'>Your cart is empty</h4>
+    </div> : <div className="w-75 mx-auto p-2 my-3 bg-main-light">
+
+
+    <div className="d-flex justify-content-between">
+
+    <h3 className='fw-bolder'>Cart Shop</h3>
+    <Link to={'/address'} className='btn bg-main text-white w-25 fw-bold'>CheckOut</Link>
+
+
+
+
+    </div>
+      
       <h4 className='h6 text-main'>Cart Items: {cartDetails.numOfCartItems}</h4>
       <h4 className='h6 text-main mb-4'>Total Cart price: {cartDetails.data.totalCartPrice} EGP</h4>
       {cartDetails.data.products.map((product) => <div key={product.product.id} className='row border-bottom py-2 px-2'>
@@ -53,15 +85,15 @@ export default function Cart() {
 
             <div>
 
-              <h3 className='h6'>{product.product.title.split(' ').slice(0, 3).join(' ')}</h3>
+              <h3 className='h6'>{product?.product.title?.split(' ')?.slice(0, 3)?.join(' ')}</h3>
               <h6 className='text-main'>Price: {product.price} EGP</h6>
 
             </div>
 
             <div>
-              <button onClick={()=>UpdateCount(product.product.id , product.count + 1)} className='btn brdr-main'> +</button>
+              <button onClick={() => UpdateCount(product.product.id, product.count + 1)} className='btn brdr-main'> +</button>
               <span className='m-2'>{product.count}</span>
-              <button onClick={()=>UpdateCount(product.product.id , product.count - 1)} className='btn brdr-main'> -</button>
+              <button onClick={() => UpdateCount(product.product.id, product.count - 1)} className='btn brdr-main'> -</button>
             </div>
 
           </div>
@@ -77,17 +109,9 @@ export default function Cart() {
       </div>)}
 
 
-    </div> : <section id='loading' className='d-flex justify-content-center align-items-center'> <TailSpin
-      height="80"
-      width="80"
-      color="#4fa94d"
-      ariaLabel="tail-spin-loading"
-      radius="1"
-      wrapperStyle={{}}
-      wrapperClass=""
-      visible={true}
-    /> </section>}
+      <button onClick={() => ClearCart()} className="trash p-2 btn bg-light w-25 brdr-main"> <i className='text-danger fas fa-trash fa-can'></i> Clear Cart</button>
+
+    </div>}
 
   </>
 }
-

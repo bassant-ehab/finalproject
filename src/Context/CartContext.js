@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createContext } from "react";
+import { createContext, useState } from "react";
 
 
 
@@ -7,6 +7,8 @@ export let CartContext = createContext();
 
 
 export function CartContextProvider(props) {
+    
+    const [cartDetails, setCartDetails] = useState(null);
 
     let headers = { token: localStorage.getItem('userToken') }
 
@@ -39,7 +41,21 @@ export function CartContextProvider(props) {
 
     }
 
-    return <CartContext.Provider value={{ addToCart , getLoggedUserCart , Remove , Update}}>
+    function OnlinePayment(cartId , url ,values){
+
+        return axios.post(`https://ecommerce.routemisr.com/api/v1/orders/checkout-session/${cartId}/?url=${url}` , {shippingAddress:values} , {headers})
+       .then((response) => response)
+            .catch((error) => error);
+
+    }
+
+    function Clear(){
+        return axios.delete(`https://ecommerce.routemisr.com/api/v1/cart`, {headers})
+        .then((response) => response)
+        .catch((error) => error);
+    }
+
+    return <CartContext.Provider value={{ addToCart , OnlinePayment ,  getLoggedUserCart , Remove , Update , Clear, cartDetails, setCartDetails}}>
         {props.children}
     </CartContext.Provider>
 }

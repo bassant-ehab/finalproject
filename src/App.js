@@ -15,6 +15,8 @@ import { CartContextProvider } from './Context/CartContext';
 import UserContextProvider from './Context/UserContext';
 import { Toaster } from 'react-hot-toast';
 import ProtectRoute from './Components/ProtectedRoute/ProtectedRoute';
+import Address from './Components/Address/Address';
+
 
 
 let routers = createBrowserRouter([
@@ -26,6 +28,7 @@ let routers = createBrowserRouter([
     {path:'Wishlist' , element:<ProtectRoute><Wishlist /></ProtectRoute>},
     {path:'Logout' , element:<ProtectRoute><Logout /></ProtectRoute>},
     {path:'Brands' , element:<ProtectRoute><Brands /></ProtectRoute>},
+    {path:'Address' , element:<ProtectRoute><Address /></ProtectRoute>},
     {path:'Login' , element:<ProtectRoute><Login /></ProtectRoute>},
     {path:'ProductDetails/:id' , element:<ProtectRoute><ProductDetails /></ProtectRoute>},
 
